@@ -20,6 +20,7 @@ CREATE TABLE IF NOT EXISTS "users" (
     "id" INT GENERATED ALWAYS AS IDENTITY,
     "firstname" varchar(255) NOT NULL,
     "lastname" varchar(255) NOT NULL,
+    "description" varchar(255) NOT NULL,
     "email" varchar(255) NOT NULL,
     "company_id" INT,
     "created_at" timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
@@ -54,6 +55,32 @@ CREATE TABLE IF NOT EXISTS "projects" (
     PRIMARY KEY ("id")
 );
 
+--Create Skills table
+CREATE TABLE IF NOT EXISTS "skills" (
+    "id" INT GENERATED ALWAYS AS IDENTITY,
+    "name" varchar(255) NOT NULL,
+    "use" varchar(255) NOT NULL,
+    "created_at" timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    "updated_at" timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    PRIMARY KEY ("id")
+);
+
+--Create project skills table
+CREATE TABLE IF NOT EXISTS "project_skills" (
+    "id" INT GENERATED ALWAYS AS IDENTITY,
+    "project_id" INTEGER NOT NULL,
+    "skill_id" INTEGER NOT NULL,
+    "created_at" timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    "updated_at" timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    PRIMARY KEY ("id"),
+    CONSTRAINT fk_project
+      FOREIGN KEY(project_id) 
+      REFERENCES projects(id),
+    Constraint fk_skill
+      FOREIGN KEY(skill_id)
+      REFERENCES skills(id)
+);
+
 --Create Project Users table
 CREATE TABLE IF NOT EXISTS "project_users" (
     "id" INT GENERATED ALWAYS AS IDENTITY,
@@ -68,16 +95,6 @@ CREATE TABLE IF NOT EXISTS "project_users" (
     Constraint fk_user
       FOREIGN KEY(user_id)
       REFERENCES users(id)
-);
-
---Create Skills table
-CREATE TABLE IF NOT EXISTS "skills" (
-    "id" INT GENERATED ALWAYS AS IDENTITY,
-    "name" varchar(255) NOT NULL,
-    "use" varchar(255) NOT NULL,
-    "created_at" timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
-    "updated_at" timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
-    PRIMARY KEY ("id")
 );
 
 --Create skills users table
