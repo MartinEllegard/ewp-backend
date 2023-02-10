@@ -1,5 +1,4 @@
 use std::env;
-
 use actix_web::{web, App, HttpServer, Responder, HttpResponse};
 use time::OffsetDateTime;
 use serde::{Serialize, Deserialize};
@@ -14,12 +13,10 @@ struct AppState {
 #[actix_web::main]
 async fn main() -> std::io::Result<()> {
     dotenv::dotenv().ok();
-
-    let db_env_url = env::var("DATABASE_URL").expect("DATABASE_URL must be set");
-    let db_url = db_env_url.as_str();
+    let db_env_url = env::var("DATABASE_URL").expect("DATABASE_URL must be set in .env file");
     let pool = PgPoolOptions::new()
         .max_connections(5)
-        .connect(db_url)
+        .connect(db_env_url.as_str())
         .await
         .unwrap();
 
@@ -98,7 +95,7 @@ async fn post_user(app_state: web::Data<AppState>, user: web::Json<User>) -> Htt
         user.email)
         .fetch_one(&app_state.pool)
         .await;
-    
+
     match user_exist {
         Ok(_) => {
             return HttpResponse::Conflict().body("User already exist");
