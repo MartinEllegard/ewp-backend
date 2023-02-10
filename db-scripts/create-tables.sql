@@ -1,8 +1,10 @@
 DROP TABLE IF EXISTS "skills_correlation";
 DROP TABLE IF EXISTS "skills_users";
+DROP TABLE IF EXISTS "project_skills";
 DROP TABLE IF EXISTS "skills";
 DROP TABLE IF EXISTS "project_users";
 DROP TABLE IF EXISTS "projects";
+DROP TABLE IF EXISTS "oauth_access_tokens";
 DROP TABLE IF EXISTS "users";
 DROP TABLE IF EXISTS "companies";
 
@@ -10,8 +12,8 @@ DROP TABLE IF EXISTS "companies";
 CREATE TABLE IF NOT EXISTS "companies" (
     "id" INT GENERATED ALWAYS AS IDENTITY,
     "name" varchar(255) NOT NULL,
-    "created_at" timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
-    "updated_at" timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    "created_at" timestamp with time zone NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    "updated_at" timestamp with time zone NOT NULL DEFAULT CURRENT_TIMESTAMP,
     PRIMARY KEY ("id")
 );
 
@@ -23,8 +25,8 @@ CREATE TABLE IF NOT EXISTS "users" (
     "description" varchar(255) NOT NULL,
     "email" varchar(255) NOT NULL,
     "company_id" INT,
-    "created_at" timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
-    "updated_at" timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    "created_at" timestamp with time zone NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    "updated_at" timestamp with time zone NOT NULL DEFAULT CURRENT_TIMESTAMP,
     PRIMARY KEY ("id"),
     CONSTRAINT fk_company
       FOREIGN KEY(company_id) 
@@ -37,7 +39,7 @@ CREATE TABLE IF NOT EXISTS "oauth_access_tokens" (
     "id" INT GENERATED always AS IDENTITY,
     "user_id" INT NOT NULL,
     "access_token" varchar(255) NOT NULL,
-    "expires_at" timestamp NOT NULL,
+    "expires_at" timestamp with time zone NOT NULL,
     PRIMARY KEY ("id"),
     CONSTRAINT fk_user
         FOREIGN KEY(user_id)
@@ -50,8 +52,8 @@ CREATE TABLE IF NOT EXISTS "projects" (
     "id" INT GENERATED ALWAYS AS IDENTITY,
     "name" varchar(255) NOT NULL,
     "description" varchar(255) NOT NULL,
-    "created_at" timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
-    "updated_at" timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    "created_at" timestamp with time zone NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    "updated_at" timestamp with time zone NOT NULL DEFAULT CURRENT_TIMESTAMP,
     PRIMARY KEY ("id")
 );
 
@@ -60,18 +62,18 @@ CREATE TABLE IF NOT EXISTS "skills" (
     "id" INT GENERATED ALWAYS AS IDENTITY,
     "name" varchar(255) NOT NULL,
     "use" varchar(255) NOT NULL,
-    "created_at" timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
-    "updated_at" timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    "created_at" timestamp with time zone NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    "updated_at" timestamp with time zone NOT NULL DEFAULT CURRENT_TIMESTAMP,
     PRIMARY KEY ("id")
 );
 
 --Create project skills table
 CREATE TABLE IF NOT EXISTS "project_skills" (
     "id" INT GENERATED ALWAYS AS IDENTITY,
-    "project_id" INTEGER NOT NULL,
-    "skill_id" INTEGER NOT NULL,
-    "created_at" timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
-    "updated_at" timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    "project_id" INT NOT NULL,
+    "skill_id" INT NOT NULL,
+    "created_at" timestamp with time zone NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    "updated_at" timestamp with time zone NOT NULL DEFAULT CURRENT_TIMESTAMP,
     PRIMARY KEY ("id"),
     CONSTRAINT fk_project
       FOREIGN KEY(project_id) 
@@ -84,10 +86,10 @@ CREATE TABLE IF NOT EXISTS "project_skills" (
 --Create Project Users table
 CREATE TABLE IF NOT EXISTS "project_users" (
     "id" INT GENERATED ALWAYS AS IDENTITY,
-    "project_id" INTEGER NOT NULL,
-    "user_id" INTEGER NOT NULL,
-    "created_at" timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
-    "updated_at" timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    "project_id" INT NOT NULL,
+    "user_id" INT NOT NULL,
+    "created_at" timestamp with time zone NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    "updated_at" timestamp with time zone NOT NULL DEFAULT CURRENT_TIMESTAMP,
     PRIMARY KEY ("id"),
     CONSTRAINT fk_project
       FOREIGN KEY(project_id) 
@@ -100,11 +102,11 @@ CREATE TABLE IF NOT EXISTS "project_users" (
 --Create skills users table
 CREATE TABLE IF NOT EXISTS "skills_users" (
     "id" INT GENERATED ALWAYS AS IDENTITY,
-    "skill_id" INTEGER NOT NULL,
-    "user_id" INTEGER NOT NULL,
-    "proficiency" INTEGER NOT NULL, -- 1-5
-    "created_at" timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
-    "updated_at" timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    "skill_id" INT NOT NULL,
+    "user_id" INT NOT NULL,
+    "proficiency" INT NOT NULL, -- 1-5
+    "created_at" timestamp with time zone NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    "updated_at" timestamp with time zone NOT NULL DEFAULT CURRENT_TIMESTAMP,
     PRIMARY KEY ("id"),
     Constraint fk_skill
       FOREIGN KEY(skill_id)
@@ -117,11 +119,11 @@ CREATE TABLE IF NOT EXISTS "skills_users" (
 --Create skill corelation table
 CREATE TABLE IF NOT EXISTS "skills_correlation" (
     "id" INT GENERATED ALWAYS AS IDENTITY,
-    "skill_primary" INTEGER NOT NULL,
-    "skill_secondary" INTEGER NOT NULL,
-    "correlation" INTEGER NOT NULL, -- 1-10
-    "created_at" timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
-    "updated_at" timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    "skill_primary" INT NOT NULL,
+    "skill_secondary" INT NOT NULL,
+    "correlation" INT NOT NULL, -- 1-10
+    "created_at" timestamp with time zone NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    "updated_at" timestamp with time zone NOT NULL DEFAULT CURRENT_TIMESTAMP,
     PRIMARY KEY ("id"),
     CONSTRAINT fk_skill_primary
       FOREIGN KEY(skill_primary)
