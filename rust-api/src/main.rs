@@ -3,6 +3,7 @@ use actix_web::{web, App, HttpServer, Responder};
 use sqlx::postgres::{PgPoolOptions, PgPool};
 
 pub mod schemas;
+pub mod models;
 mod routes;
 
 //Actix web state
@@ -32,6 +33,7 @@ async fn main() -> std::io::Result<()> {
             .route("/users", web::get().to(routes::user::get_users))
             .route("/users/{id}", web::get().to(routes::user::get_user))
             .route("/users", web::post().to(routes::user::post_user))
+            .route("/users/{id}", web::put().to(routes::user::put_user))
     })
     .bind(("127.0.0.1", 8080))?
     .run()
