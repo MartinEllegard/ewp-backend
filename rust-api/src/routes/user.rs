@@ -31,7 +31,7 @@ pub async fn get_users(app_state: web::Data<AppState>) -> HttpResponse {
 
     match users {
         Ok(users) => {
-            let out = users.into_iter().map(|user| {
+            HttpResponse::Ok().json(users.into_iter().map(|user| {
                 User {
                     id: user.id,
                     firstname: user.firstname,
@@ -40,8 +40,7 @@ pub async fn get_users(app_state: web::Data<AppState>) -> HttpResponse {
                     email: user.email,
                     company_id: user.company_id,
                 }
-            }).collect::<Vec<User>>();
-            HttpResponse::Ok().json(out)
+            }).collect::<Vec<User>>())
         },
         Err(e) => {
             HttpResponse::Ok().body(e.to_string())
