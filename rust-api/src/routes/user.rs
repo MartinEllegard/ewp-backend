@@ -23,7 +23,7 @@ pub async fn get_users(app_state: web::Data<AppState>) -> HttpResponse {
             }).collect::<Vec<models::user::ReturnUser>>())
         },
         Err(e) => {
-            HttpResponse::Ok().body(e.to_string())
+            HttpResponse::InternalServerError().body(e.to_string())
         }
     }
 }
@@ -96,7 +96,7 @@ pub async fn post_user(app_state: web::Data<AppState>, user_json: web::Json<mode
             })
         },
         Err(e) => {
-            HttpResponse::Ok().body(e.to_string())
+            HttpResponse::InternalServerError().body(e.to_string())
         }
     }
 }
