@@ -1,18 +1,25 @@
 use actix_web::{web, HttpResponse};
 use serde::{Serialize, Deserialize};
-use time::OffsetDateTime;
 
 use crate::{schemas, AppState};
 
 #[derive(Serialize, Deserialize, Debug)]
-pub struct User {
+pub struct InputUser {
     firstname: String,
     lastname: String,
     description: String,
     email: String,
     company_id: Option<i32>,
-    created_at: OffsetDateTime,
-    updated_at: OffsetDateTime,
+}
+
+#[derive(Serialize, Deserialize, Debug)]
+pub struct User {
+    id: i32,
+    firstname: String,
+    lastname: String,
+    description: String,
+    email: String,
+    company_id: Option<i32>,
 }
 
 pub async fn get_users(app_state: web::Data<AppState>) -> HttpResponse {
@@ -24,7 +31,17 @@ pub async fn get_users(app_state: web::Data<AppState>) -> HttpResponse {
 
     match users {
         Ok(users) => {
-            HttpResponse::Ok().json(users)
+            let out = users.into_iter().map(|user| {
+                User {
+                    id: user.id,
+                    firstname: user.firstname,
+                    lastname: user.lastname,
+                    description: user.description,
+                    email: user.email,
+                    company_id: user.company_id,
+                }
+            }).collect::<Vec<User>>();
+            HttpResponse::Ok().json(out)
         },
         Err(e) => {
             HttpResponse::Ok().body(e.to_string())
@@ -43,15 +60,22 @@ pub async fn get_user(app_state: web::Data<AppState>, path: web::Path<i32>) -> H
 
     match user {
         Ok(user) => {
-            HttpResponse::Ok().json(user)
+            HttpResponse::Ok().json(User {
+                id: user.id,
+                firstname: user.firstname,
+                lastname: user.lastname,
+                description: user.description,
+                email: user.email,
+                company_id: user.company_id,
+            })
         },
         Err(e) => {
-            HttpResponse::Ok().body(e.to_string())
+            HttpResponse::InternalServerError().body(e.to_string())
         }
     }
 }
 
-pub async fn post_user(app_state: web::Data<AppState>, user_json: web::Json<User>) -> HttpResponse {
+pub async fn post_user(app_state: web::Data<AppState>, user_json: web::Json<InputUser>) -> HttpResponse {
     let user = user_json.into_inner();
 
     let user_exist = sqlx::query_as!(
@@ -76,14 +100,21 @@ pub async fn post_user(app_state: web::Data<AppState>, user_json: web::Json<User
         user.description,
         user.email,
         user.company_id,
-        user.created_at,
-        user.updated_at)
+        time::OffsetDateTime::now_utc(),
+        time::OffsetDateTime::now_utc())
         .fetch_one(&app_state.pool)
         .await;
 
     match new_user {
         Ok(new_user) => {
-            HttpResponse::Ok().json(new_user)
+            HttpResponse::Ok().json(User {
+                id: new_user.id,
+                firstname: new_user.firstname,
+                lastname: new_user.lastname,
+                description: new_user.description,
+                email: new_user.email,
+                company_id: new_user.company_id,
+            })
         },
         Err(e) => {
             HttpResponse::Ok().body(e.to_string())
