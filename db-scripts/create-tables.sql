@@ -61,7 +61,7 @@ CREATE TABLE IF NOT EXISTS "projects" (
 CREATE TABLE IF NOT EXISTS "skills" (
     "id" INT GENERATED ALWAYS AS IDENTITY,
     "name" varchar(255) NOT NULL,
-    "use" varchar(255) NOT NULL,
+    "skill_use" varchar(255) NOT NULL,
     "created_at" timestamp with time zone NOT NULL DEFAULT CURRENT_TIMESTAMP,
     "updated_at" timestamp with time zone NOT NULL DEFAULT CURRENT_TIMESTAMP,
     PRIMARY KEY ("id")
@@ -121,7 +121,7 @@ CREATE TABLE IF NOT EXISTS "skills_correlation" (
     "id" INT GENERATED ALWAYS AS IDENTITY,
     "skill_primary" INT NOT NULL,
     "skill_secondary" INT NOT NULL,
-    "correlation" INT NOT NULL, -- 1-10
+    "correlation" FLOAT NOT NULL, -- 1-10
     "created_at" timestamp with time zone NOT NULL DEFAULT CURRENT_TIMESTAMP,
     "updated_at" timestamp with time zone NOT NULL DEFAULT CURRENT_TIMESTAMP,
     PRIMARY KEY ("id"),
