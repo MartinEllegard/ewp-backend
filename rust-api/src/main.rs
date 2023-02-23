@@ -4,7 +4,7 @@ use sqlx::postgres::{PgPoolOptions, PgPool};
 
 pub mod schemas;
 pub mod models;
-mod routes;
+mod api;
 
 //Actix web state
 #[derive(Clone)]
@@ -29,11 +29,8 @@ async fn main() -> std::io::Result<()> {
     HttpServer::new(move || {
         App::new()
             .app_data(web::Data::new(app_state.clone()))
+            .service(web::scope("/api").configure(api::scoped_config))
             .route("/", web::get().to(index))
-            .route("/users", web::get().to(routes::user::get_users))
-            .route("/users/{id}", web::get().to(routes::user::get_user))
-            .route("/users", web::post().to(routes::user::post_user))
-            .route("/users/{id}", web::put().to(routes::user::put_user))
     })
     .bind(("127.0.0.1", 8080))?
     .run()

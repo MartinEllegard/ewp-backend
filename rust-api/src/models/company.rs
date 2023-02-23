@@ -11,6 +11,7 @@ pub struct ReturnCompany {
     pub name: String,
 }
 
+#[derive(Serialize, Deserialize, Debug)]
 pub struct CompanyWithUsers {
     pub id: i32,
     pub name: String,
