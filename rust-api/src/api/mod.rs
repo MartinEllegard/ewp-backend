@@ -15,4 +15,8 @@ pub fn scoped_config(cfg: &mut web::ServiceConfig) {
             .route(web::get().to(user::get_user))
             .route(web::put().to(user::put_user))
     );
+    cfg.service(
+        web::resource("/users/{id}/skills")
+            .route(web::get().to(user::get_user_skills))
+    );
 }

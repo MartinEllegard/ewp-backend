@@ -1,4 +1,4 @@
-use actix_web::{web, HttpResponse};
+use actix_web::{web, HttpResponse, guard::Options};
 
 use crate::{schemas, AppState, models};
 
@@ -8,10 +8,9 @@ pub async fn get_users(app_state: web::Data<AppState>) -> HttpResponse {
         "SELECT * FROM users")
         .fetch_all(&app_state.pool)
         .await;
-
     match users {
         Ok(users) => {
-            HttpResponse::Ok().json(users.into_iter().map(|user| {
+            let model = users.into_iter().map(|user| {
                 models::user::ReturnUser {
                     id: user.id,
                     firstname: user.firstname,
@@ -20,7 +19,9 @@ pub async fn get_users(app_state: web::Data<AppState>) -> HttpResponse {
                     email: user.email,
                     company_id: user.company_id,
                 }
-            }).collect::<Vec<models::user::ReturnUser>>())
+            }).collect::<Vec<models::user::ReturnUser>>();
+
+            HttpResponse::Ok().json(model)
         },
         Err(e) => {
             HttpResponse::InternalServerError().body(e.to_string())
@@ -142,6 +143,50 @@ pub async fn put_user (app_state: web::Data<AppState>, path: web::Path<i32>, use
                 email: updated_user.email,
                 company_id: updated_user.company_id,
             })
+        },
+        Err(e) => {
+            HttpResponse::InternalServerError().body(e.to_string())
+        }
+    }
+}
+
+// Get user skills
+pub async fn get_user_skills (app_state: web::Data<AppState>, path: web::Path<i32>) -> HttpResponse {
+    let id = path.into_inner();
+
+    let user_exist = sqlx::query_as!(
+        schemas::User,
+        "SELECT * FROM users WHERE id = $1",
+        id)
+        .fetch_one(&app_state.pool)
+        .await;
+
+    match user_exist {
+        Ok(_) => {},
+        Err(_) => {
+            return HttpResponse::NotFound().body("User not found");
+        }
+    }
+
+    let user_skills = sqlx::query_as!(
+        schemas::SkillUser,
+        "SELECT * FROM skills_users WHERE user_id = $1",
+        id)
+        .fetch_all(&app_state.pool)
+        .await;
+
+    match user_skills {
+        Ok(user_skills) => {
+            let model = user_skills.into_iter().map(|user_skill| {
+                models::user_skill::ReturnUserSkill {
+                    id: user_skill.id,
+                    user_id: user_skill.user_id,
+                    skill_id: user_skill.skill_id,
+                    proficiency: user_skill.proficiency,
+                }
+            }).collect::<Vec<models::user_skill::ReturnUserSkill>>();
+
+            HttpResponse::Ok().json(model)
         },
         Err(e) => {
             HttpResponse::InternalServerError().body(e.to_string())

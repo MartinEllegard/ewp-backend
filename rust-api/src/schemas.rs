@@ -51,12 +51,12 @@ pub struct Skill {
 
 #[derive(Serialize, Deserialize, Debug)]
 pub struct SkillUser {
-    id: i32,
-    user_id: i32,
-    skill_id: i32,
-    proficiency: i32,
-    created_at: OffsetDateTime,
-    updated_at: OffsetDateTime,
+    pub id: i32,
+    pub user_id: i32,
+    pub skill_id: i32,
+    pub proficiency: i32,
+    pub created_at: OffsetDateTime,
+    pub updated_at: OffsetDateTime,
 }
 
 #[derive(Serialize, Deserialize, Debug)]
