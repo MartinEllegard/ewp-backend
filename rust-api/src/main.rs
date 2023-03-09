@@ -1,15 +1,15 @@
-use std::env;
 use actix_web::{web, App, HttpServer, Responder};
-use sqlx::postgres::{PgPoolOptions, PgPool};
+use sqlx::postgres::{PgPool, PgPoolOptions};
+use std::env;
 
-pub mod schemas;
-pub mod models;
 mod api;
+pub mod models;
+pub mod schemas;
 
 //Actix web state
 #[derive(Clone)]
 pub struct AppState {
-    pool: PgPool
+    pool: PgPool,
 }
 
 #[actix_web::main]
@@ -23,7 +23,7 @@ async fn main() -> std::io::Result<()> {
         .unwrap();
 
     let app_state = AppState {
-        pool: pool,
+        pool,
     };
 
     HttpServer::new(move || {

@@ -1,6 +1,6 @@
-use actix_web::{web, HttpResponse, guard::Options};
+use actix_web::{web, HttpResponse};
 
-use crate::{schemas, AppState, models};
+use crate::{schemas, AppState, models::{self, project::ReturnProject}};
 
 pub async fn get_users(app_state: web::Data<AppState>) -> HttpResponse {
     let users = sqlx::query_as!(
@@ -65,11 +65,8 @@ pub async fn post_user(app_state: web::Data<AppState>, user_json: web::Json<mode
         .fetch_one(&app_state.pool)
         .await;
 
-    match user_exist {
-        Ok(_) => {
-            return HttpResponse::Conflict().body("User already exist");
-        },
-        Err(_) => {}
+    if user_exist.is_ok(){
+        return HttpResponse::Conflict().body("User already exist");
     }
 
     let new_user = sqlx::query_as!(
@@ -113,11 +110,8 @@ pub async fn put_user (app_state: web::Data<AppState>, path: web::Path<i32>, use
         .fetch_one(&app_state.pool)
         .await;
 
-    match user_exist {
-        Ok(_) => {},
-        Err(_) => {
-            return HttpResponse::NotFound().body("User not found");
-        }
+    if user_exist.is_err(){
+        return HttpResponse::NotFound().body("User not found");
     }
 
     let updated_user = sqlx::query_as!(
@@ -161,11 +155,8 @@ pub async fn get_user_skills (app_state: web::Data<AppState>, path: web::Path<i3
         .fetch_one(&app_state.pool)
         .await;
 
-    match user_exist {
-        Ok(_) => {},
-        Err(_) => {
-            return HttpResponse::NotFound().body("User not found");
-        }
+    if user_exist.is_err() {
+        return HttpResponse::NotFound().body("User not found");
     }
 
     let user_skills = sqlx::query_as!(
