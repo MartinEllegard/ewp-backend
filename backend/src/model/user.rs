@@ -1,5 +1,8 @@
+use serde::{Serialize, Deserialize};
+
 use super::skill::BaseSkill;
 
+#[derive(Serialize, Deserialize, Debug, Clone)]
 pub struct BaseUser {
     pub user_uuid: String,
     pub description: String,
@@ -8,6 +11,7 @@ pub struct BaseUser {
     pub age: i32,
 }
 
+#[derive(Serialize, Deserialize, Debug, Clone)]
 pub struct UserSkill {
     pub skill_uuid: String,
     pub name: String,
@@ -15,12 +19,14 @@ pub struct UserSkill {
     pub level: i32,
 }
 
+#[derive(Serialize, Deserialize, Debug, Clone)]
 pub struct UserCompany {
     pub uuid: String,
     pub name: String,
     pub description: String,
 }
 
+#[derive(Serialize, Deserialize, Debug, Clone)]
 pub struct UserProject {
     pub uuid: String,
     pub name: String,
@@ -28,8 +34,9 @@ pub struct UserProject {
     pub skills: Option<Vec<BaseSkill>>,
 }
 
+#[derive(Serialize, Deserialize, Debug, Clone)]
 pub struct User {
-    pub user_uuid: String,
+    pub uuid: String,
     pub description: String,
     pub name: String,
     pub email: String,
