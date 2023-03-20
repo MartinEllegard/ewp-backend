@@ -1,5 +1,5 @@
 use actix_web::web;
-use actix_web_httpauth::extractors::bearer::BearerAuth;
+//use actix_web_httpauth::extractors::bearer::BearerAuth;
 
 
 pub mod profiles;

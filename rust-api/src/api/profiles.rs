@@ -1,5 +1,5 @@
 use actix_web::{web, HttpResponse};
-use actix_web_httpauth::extractors::bearer::BearerAuth;
+//use actix_web_httpauth::extractors::bearer::BearerAuth;
 use uuid::Uuid;
 
 use crate::{schemas, AppState};

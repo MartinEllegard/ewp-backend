@@ -1,18 +1,18 @@
 # Use the official Rust image as the base image
-FROM rust:1.59 as builder
+FROM rust:1.68 as builder
 
 # Create a new directory for the application
 WORKDIR /usr/src/app
 
 # Copy the Cargo.toml and Cargo.lock files
-COPY Cargo.toml Cargo.lock ./
+COPY rust-api/Cargo.toml rust-api/Cargo.lock rust-api/
 
 # Create a dummy main.rs to build dependencies
 RUN echo "fn main() {}" > src/main.rs
 
 # Build dependencies in a separate step to cache them for faster builds
 RUN cargo build --release
-RUN rm -f target/release/deps/your_project_name*
+RUN rm -f target/release/deps/rust-api*
 
 # Copy the rest of the application code
 COPY . .
