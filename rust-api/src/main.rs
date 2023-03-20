@@ -2,6 +2,7 @@ use actix_web::{web, App, HttpServer, Responder};
 use std::env;
 
 mod api;
+pub mod auth;
 pub mod repository;
 pub mod schemas;
 
