@@ -31,11 +31,13 @@ jobs:
 
     - name: Log in to Amazon ECR
       run: |
-        aws ecr get-login-password --region $AWS_REGION | docker login --username AWS --password-stdin ${{ secrets.AWS_ECR_REGISTRY }}.dkr.ecr.${{ env.AWS_REGION }}.amazonaws.com
-    
+        aws ecr get-login-password --region eu-north-1 | docker login --username AWS --password-stdin ${{ secrets.AWS_ECR_REGISTRY }}.dkr.ecr.eu-north-1.amazonaws.com
+      env:
+        AWS_REGION: ${{ env.AWS_REGION }} | docker login --username AWS --password-stdin ${{ secrets.AWS_ECR_REGISTRY }}.dkr.ecr.eu-north-1.amazonaws.com
+
     - name: Build and push Docker image
       uses: docker/build-push-action@v2
       with:
         context: .
         push: true
-        tags: ${{ secrets.AWS_ECR_REGISTRY }}.dkr.ecr.${{ env.AWS_REGION }}.amazonaws.com/your-ecr-repo-name:${{ github.sha }}
+        tags: ${{ secrets.AWS_ECR_REGISTRY }}.dkr.ecr.eu-north-1.amazonaws.com/ewp-rust:${{ github.sha }}
