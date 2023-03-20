@@ -1,20 +1,41 @@
-# set up rust runtime enviroment
-FROM rust:1.54.0-slim-buster
+# Use the official Rust image as the base image
+FROM rust:1.59 as builder
 
-# set up working directory
+# Create a new directory for the application
 WORKDIR /usr/src/app
 
-# copy source code
+# Copy the Cargo.toml and Cargo.lock files
+COPY Cargo.toml Cargo.lock ./
+
+# Create a dummy main.rs to build dependencies
+RUN echo "fn main() {}" > src/main.rs
+
+# Build dependencies in a separate step to cache them for faster builds
+RUN cargo build --release
+RUN rm -f target/release/deps/your_project_name*
+
+# Copy the rest of the application code
 COPY . .
 
-# build the project
+# Build the application
 RUN cargo build --release
 
-# set up runtime enviroment
+# Create a new lightweight image for deployment
 FROM debian:buster-slim
 
-# run aptget update
-RUN apt-get update && apt-get install -y extra-runtime-dependencies && rm -rf /var/lib/apt/lists/*
+# Install necessary dependencies for SSL support
+RUN apt-get update \
+    && apt-get install -y ca-certificates tzdata \
+    && rm -rf /var/lib/apt/lists/*
 
-COPY --from=0 /usr/src/app/target/release/rust-api /usr/local/bin/rust-api
-CMD ["rust-api"]
+# Copy the binary from the builder image
+COPY --from=builder /usr/src/app/target/release/rust-api /usr/local/bin/
+
+# Set the working directory
+WORKDIR /usr/local/bin
+
+# Expose the application port
+EXPOSE 8080
+
+# Start the application
+CMD ["./rust-api"]
