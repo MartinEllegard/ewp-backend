@@ -1,11 +1,18 @@
 use std::time::{SystemTime, UNIX_EPOCH};
 use actix_web::{web, Responder, HttpResponse};
 use serde_json::json;
+use uuid::Uuid;
 
 use crate::{AppState, schemas, auth::Claims};
 
-pub async fn register_user(data: web::Data<AppState>, new_user: web::Json::<schemas::User>) -> impl Responder {
-    let result = data.repository.register_user(new_user.into_inner()).await;
+pub async fn register_user(data: web::Data<AppState>, new_user_no_id_json: web::Json::<schemas::UserNoId>) -> impl Responder {
+    let new_user_no_id = new_user_no_id_json.into_inner();
+    let new_user = schemas::User {
+        id: Uuid::new_v4().to_string(),
+        username: new_user_no_id.username,
+        password: new_user_no_id.password,
+    };
+    let result = data.repository.register_user(new_user).await;
     match result {
         Ok(_) => HttpResponse::Created().finish(),
         Err(e) => {
@@ -15,7 +22,7 @@ pub async fn register_user(data: web::Data<AppState>, new_user: web::Json::<sche
     }
 }
 
-pub async fn authenticate_user(data: web::Data<AppState>, user: web::Json::<schemas::User>) -> impl Responder {
+pub async fn authenticate_user(data: web::Data<AppState>, user: web::Json::<schemas::UserNoId>) -> impl Responder {
     let result = data.repository.authenticate_user(&user.username, &user.password).await;
     match result {
         Ok(Some(user)) => {
