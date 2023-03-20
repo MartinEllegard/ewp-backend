@@ -1,0 +1,69 @@
+{
+    "id": "uuid",
+    "name": "Martin",
+    "description": "Software developer",
+    "age": 25,
+    "email": "test.joe@something.no",
+    "company": "Company A",
+    "skills": [
+        {
+            "name": "Java",
+            "level": 5,
+            "description": "Java is a general-purpose computer-programming language that is concurrent, class-based, object-oriented, and specifically designed to have as few implementation dependencies as possible."
+        },
+        {
+            "name": "Python",
+            "level": 4,
+            "description": "Python is an interpreted, high-level, general-purpose programming language. Created by Guido van Rossum and first released in 1991, Python's design philosophy emphasizes code readability with its notable use of significant whitespace."
+        },
+        {
+            "name": "C#",
+            "level": 3,
+            "description": "C# is a general-purpose, multi-paradigm programming language encompassing strong typing, lexically scoped, imperative, declarative, functional, generic, object-oriented (class-based), and component-oriented programming disciplines."
+        }
+    ],
+    "experience": [
+        {
+            "company": "Company A",
+            "position": "Software developer",
+            "description": "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed euismod,"
+        },
+        {
+            "company": "Company B",
+            "position": "Software developer",
+            "description": "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed euismod,"
+        }
+    ],
+    "education": [
+        {
+            "school": "School A",
+            "degree": "Bachelor",
+            "description": "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed euismod,"
+        },
+        {
+            "school": "School B",
+            "degree": "Master",
+            "description": "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed euismod,"
+        }
+    ],
+    "projects": [
+        {
+            "name": "Project A",
+            "description": "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed euismod,"
+        },
+        {
+            "name": "Project B",
+            "description": "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed euismod,"
+        }
+    ],
+    "certificates": [
+        {
+            "name": "Certificate A",
+            "description": "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed euismod,"
+        },
+        {
+            "name": "Certificate B",
+            "description": "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed euismod,"
+        }
+    ]
+}

@@ -1,88 +1,65 @@
 
 use serde::{Serialize, Deserialize};
-use time::OffsetDateTime;
+use uuid::Uuid;
 
-#[derive(Serialize, Deserialize, Debug)]
-pub struct User {
-    pub id: i32,
-    pub firstname: String,
-    pub lastname: String,
-    pub description: String,
-    pub email: String,
-    pub company_id: Option<i32>,
-    pub created_at: OffsetDateTime,
-    pub updated_at: OffsetDateTime,
-}
-
-#[derive(Serialize, Deserialize, Debug)]
-pub struct Company {
-    id: i32,
-    name: String,
-    created_at: OffsetDateTime,
-    updated_at: OffsetDateTime,
-}
-
-#[derive(Serialize, Deserialize, Debug)]
-pub struct OAuthAccessToken {
-    id: i32,
-    user_id: i32,
-    accesstoken: String,
-    expires_at: OffsetDateTime,
-}
-
-#[derive(Serialize, Deserialize, Debug)]
-pub struct Project {
-    id: i32,
-    name: String,
-    description: String,
-    created_at: OffsetDateTime,
-    updated_at: OffsetDateTime,
-}
-
-
-#[derive(Serialize, Deserialize, Debug)]
+#[derive(Debug, Serialize, Deserialize)]
 pub struct Skill {
-    id: i32,
-    name: String,
-    skill_use: String,
-    created_at: OffsetDateTime,
-    updated_at: OffsetDateTime,
+    pub name: String,
+    pub level: u32,
+    pub description: String,
 }
 
-#[derive(Serialize, Deserialize, Debug)]
-pub struct SkillUser {
-    pub id: i32,
-    pub user_id: i32,
-    pub skill_id: i32,
-    pub proficiency: i32,
-    pub created_at: OffsetDateTime,
-    pub updated_at: OffsetDateTime,
+#[derive(Debug, Serialize, Deserialize)]
+pub struct Experience {
+    pub company: String,
+    pub position: String,
+    pub description: String,
 }
 
-#[derive(Serialize, Deserialize, Debug)]
-pub struct ProjectSkill {
-    id: i32,
-    project_id: i32,
-    skill_id: i32,
-    created_at: OffsetDateTime,
-    updated_at: OffsetDateTime,
+#[derive(Debug, Serialize, Deserialize)]
+pub struct Education {
+    pub school: String,
+    pub degree: String,
+    pub description: String,
 }
 
-#[derive(Serialize, Deserialize, Debug)]
-pub struct ProjectUser {
-    id: i32,
-    user_id: i32,
-    project_id: i32,
-    created_at: OffsetDateTime,
-    updated_at: OffsetDateTime,
+#[derive(Debug, Serialize, Deserialize)]
+pub struct Project {
+    pub name: String,
+    pub description: String,
 }
 
-#[derive(Serialize, Deserialize, Debug)]
-pub struct SkillCorrelation {
-    id: i32,
-    skill_id: i32,
-    skill_id2: i32,
-    correlation: f32,
-    created_at: OffsetDateTime,
-    updated_at: OffsetDateTime,
+#[derive(Debug, Serialize, Deserialize)]
+pub struct Certificate {
+    pub name: String,
+    pub description: String,
+}
+
+#[derive(Debug, Serialize, Deserialize)]
+pub struct Profile {
+    pub id: Uuid,
+    pub name: String,
+    pub description: String,
+    pub age: u32,
+    pub email: String,
+    pub company: String,
+    pub skills: Vec<Skill>,
+    pub experience: Vec<Experience>,
+    pub education: Vec<Education>,
+    pub projects: Vec<Project>,
+    pub certificates: Vec<Certificate>,
+}
+
+#[derive(Debug, Serialize, Deserialize)]
+pub struct ProfileNoId {
+    pub name: String,
+    pub description: String,
+    pub age: u32,
+    pub email: String,
+    pub company: String,
+    pub skills: Vec<Skill>,
+    pub experience: Vec<Experience>,
+    pub education: Vec<Education>,
+    pub projects: Vec<Project>,
+    pub certificates: Vec<Certificate>,
 }

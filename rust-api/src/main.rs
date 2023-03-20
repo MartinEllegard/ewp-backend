@@ -1,29 +1,24 @@
 use actix_web::{web, App, HttpServer, Responder};
-use sqlx::postgres::{PgPool, PgPoolOptions};
 use std::env;
 
 mod api;
-pub mod models;
+pub mod repository;
 pub mod schemas;
 
 //Actix web state
 #[derive(Clone)]
 pub struct AppState {
-    pool: PgPool,
+    repository: repository::mongodb::Repository,
 }
 
 #[actix_web::main]
 async fn main() -> std::io::Result<()> {
     dotenv::dotenv().ok();
-    let db_env_url = env::var("DATABASE_URL").expect("DATABASE_URL must be set in .env file");
-    let pool = PgPoolOptions::new()
-        .max_connections(5)
-        .connect(db_env_url.as_str())
-        .await
-        .unwrap();
+    let db_env_url = env::var("DATABASE_CONNECTION").expect("DATABASE_URL must be set in .env file");
+    let repository = repository::mongodb::Repository::new(db_env_url).await;
 
     let app_state = AppState {
-        pool,
+        repository,
     };
 
     HttpServer::new(move || {

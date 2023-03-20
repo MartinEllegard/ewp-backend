@@ -7,8 +7,8 @@ edition = "2021"
 
 [dependencies]
 actix-web = "^4"
-time = {version = "0.3.4", features= ["serde"]}
-uuid = {version = "^0.8.2", features = ["v4"]}
+mongodb = "2.1.1"
+futures = "0.3.1"
+uuid = {version = "^0.8.2", features = ["v4", "serde"]}
 serde = {version = "^1.0.125", features = ["derive"]}
-sqlx = { version = "0.6", features = [ "runtime-actix-native-tls" , "postgres", "time" ] }
 dotenv = "0.15.0"
