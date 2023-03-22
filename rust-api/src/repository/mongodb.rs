@@ -24,6 +24,14 @@ impl Repository {
 
     pub async fn register_user(&self, user: schemas::User) -> Result<(), mongodb::error::Error> {
         let coll = self.init_db("users");
+
+        let filter = doc! {"username": &user.username};
+        let doc = coll.find_one(filter, None).await?;
+        if doc.is_some() {
+            return Err(mongodb::error::Error::from(mongodb::error::ErrorKind::Io(std::io::Error::new(std::io::ErrorKind::AlreadyExists, "User already exists").into())));
+        }
+        
+
         let hashed_password = bcrypt::hash(&user.password).unwrap();
         let user = schemas::User {
             password: hashed_password,
@@ -62,6 +70,10 @@ impl Repository {
     }
 
     pub async fn create_profile(&self, profile: schemas::Profile) -> Result<(), mongodb::error::Error> {
+        let exists = self.check_profile_exist(&profile).await?;
+        if exists {
+            return Err(mongodb::error::Error::from(mongodb::error::ErrorKind::Io(std::io::Error::new(std::io::ErrorKind::AlreadyExists, "Profile already exists").into())));
+        }
         let doc = to_document(&profile).unwrap();
         let coll = self.init_db("profiles");
         coll.insert_one(doc, None).await?;
@@ -135,5 +147,13 @@ impl Repository {
         let filter = doc! {"id": profile_id.to_string()};
         coll.delete_one(filter, None).await?;
         Ok(())
+    }
+
+    pub async fn check_profile_exist(&self, profile: &schemas::Profile) -> Result<bool, mongodb::error::Error> {
+        let coll = self.init_db("profiles");
+        let filter = doc! {"name": &profile.name};
+
+        let doc = coll.find_one(filter, None).await?;
+        Ok(doc.is_some())
     }
 }
