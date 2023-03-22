@@ -5,6 +5,8 @@ use pwhash::bcrypt;
 
 use crate::schemas;
 
+const DB_NAME: &str = "ewp-db";
+
 #[derive(Clone)]
 pub struct Repository {
     client: Client,
@@ -18,7 +20,7 @@ impl Repository {
     }
 
     fn init_db(&self, collection_name: &str) -> Collection<Document> {
-        let db = self.client.database("your_database_name");
+        let db = self.client.database(DB_NAME);
         db.collection(collection_name)
     }
 
@@ -32,12 +34,12 @@ impl Repository {
         }
         
 
-        let hashed_password = bcrypt::hash(&user.password).unwrap();
+        let hashed_password = bcrypt::hash(&user.password).expect("Failed to hash pasword");
         let user = schemas::User {
             password: hashed_password,
             ..user
         };
-        let doc = to_document(&user).unwrap();
+        let doc = to_document(&user).expect("Failed to convert user to document");
         coll.insert_one(doc, None).await?;
 
         Ok(())
@@ -74,7 +76,7 @@ impl Repository {
         if exists {
             return Err(mongodb::error::Error::from(mongodb::error::ErrorKind::Io(std::io::Error::new(std::io::ErrorKind::AlreadyExists, "Profile already exists").into())));
         }
-        let doc = to_document(&profile).unwrap();
+        let doc = to_document(&profile).expect("Failed to convert profile to document");
         let coll = self.init_db("profiles");
         coll.insert_one(doc, None).await?;
 
