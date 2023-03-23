@@ -116,12 +116,13 @@ impl Repository {
         }
     }
 
-    pub async fn get_profiles_by_skill(&self, skill_name: &str) -> Result<Vec<schemas::Profile>, mongodb::error::Error> {
+   pub async fn get_profiles_by_skills(&self, skills_string: String) -> Result<Vec<schemas::Profile>, mongodb::error::Error> {
+        let skills: Vec<String> = skills_string.split(',').map(|s| s.trim().to_string()).collect();
         let coll = self.init_db("profiles");
-        let filter = doc! {"skills": {"$elemMatch": {"
-        name": skill_name}}};
+        let filter = doc! {"skills": {"$elemMatch": { "name": { "$in": skills } } } };
         let mut cursor = coll.find(filter, None).await?;
         let mut results = Vec::new();
+
         while let Some(doc) = cursor.next().await {
             match doc {
                 Ok(doc) => {

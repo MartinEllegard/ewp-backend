@@ -1,11 +1,11 @@
 # Use the official Rust image as the base image
-FROM rust:1.68 as builder
+FROM rust:latest as build
 
 # Create a new directory for the application
 WORKDIR /usr/src/app
 
 # Copy the Cargo.toml and Cargo.lock files
-COPY rust-api/Cargo.toml rust-api/Cargo.lock rust-api/
+COPY rust-api/ .
 
 # Create a dummy main.rs to build dependencies
 RUN echo "fn main() {}" > src/main.rs
@@ -29,7 +29,7 @@ RUN apt-get update \
     && rm -rf /var/lib/apt/lists/*
 
 # Copy the binary from the builder image
-COPY --from=builder /usr/src/app/target/release/rust-api /usr/local/bin/
+COPY --from=build /usr/src/app/target/release/rust-api /usr/local/bin/
 
 # Set the working directory
 WORKDIR /usr/local/bin

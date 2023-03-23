@@ -25,6 +25,10 @@ pub fn scoped_config(cfg: &mut web::ServiceConfig) {
             //.route(web::put().to(profiles::put_user))
     )
     .service(
+        web::resource("/profiles/skills/{skills_string}")
+            .route(web::get().to(get_profiles_by_skills)),
+    )
+    .service(
         web::resource("/auth")
             .route(web::post().to(authenticate_user)),
     );
@@ -147,6 +151,18 @@ pub async fn post_profile(app_state: web::Data<AppState>, profile_json: web::Jso
 
 pub async fn get_profile_by_id(app_state: web::Data<AppState>, profile_id: web::Path<Uuid>) -> HttpResponse {
     let profile = app_state.repository.get_profiles_by_id(profile_id.into_inner()).await;
+    match profile {
+        Ok(profile) => {
+            HttpResponse::Ok().json(profile)
+        },
+        Err(e) => {
+            HttpResponse::InternalServerError().body(e.to_string())
+        }
+    }
+}
+
+pub async fn get_profiles_by_skills(app_state: web::Data<AppState>, skills_string: web::Path<String>) -> HttpResponse {
+    let profile = app_state.repository.get_profiles_by_skills(skills_string.into_inner()).await;
     match profile {
         Ok(profile) => {
             HttpResponse::Ok().json(profile)
