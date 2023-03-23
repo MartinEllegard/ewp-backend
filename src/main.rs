@@ -21,13 +21,13 @@ async fn main() -> std::io::Result<()> {
 
     // Read the port number from the database connection string from env
     let db_env_url =
-        env::var("DATABASE_CONNECTION").expect("DATABASE_URL must be set in .env file");
+        env::var("DATABASE_CONNECTION").unwrap();
 
     // Read the port number from the PORT environment variable or use a default value
     let port: u16 = env::var("PORT")
         .ok()
         .and_then(|p| p.parse().ok())
-        .unwrap_or(80);
+        .unwrap_or(8080);
 
     let repository = repository::Repository::new(db_env_url).await;
 

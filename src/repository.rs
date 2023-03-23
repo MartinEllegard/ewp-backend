@@ -1,4 +1,5 @@
 use mongodb::{options::ClientOptions, Client, Collection, bson::{doc, Document, from_document, to_document}};
+use log;
 use uuid::Uuid;
 use futures::stream::StreamExt;
 use pwhash::bcrypt;
@@ -14,8 +15,10 @@ pub struct Repository {
 
 impl Repository {
     pub async fn new(connection_string: String) -> Self {
+        log::info!("Connecting to database client");
         let client_options = ClientOptions::parse(&connection_string).await.unwrap();
         let client = Client::with_options(client_options).unwrap();
+        log::info!("Client connected");
         Repository { client }
     }
 
