@@ -27,7 +27,7 @@ async fn main() -> std::io::Result<()> {
     let port: u16 = env::var("PORT")
         .ok()
         .and_then(|p| p.parse().ok())
-        .unwrap_or(8080);
+        .unwrap_or(80);
 
     let repository = repository::Repository::new(db_env_url).await;
 
