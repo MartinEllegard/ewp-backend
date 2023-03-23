@@ -5,7 +5,7 @@ FROM rust:latest as build
 WORKDIR /usr/src/app
 
 # Copy the Cargo.toml and Cargo.lock files
-COPY rust-api/ .
+COPY . .
 
 # Create a dummy main.rs to build dependencies
 RUN echo "fn main() {}" > src/main.rs
