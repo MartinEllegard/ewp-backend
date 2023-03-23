@@ -33,7 +33,7 @@ async fn main() -> std::io::Result<()> {
 
     let app_state = AppState { repository };
 
-    log::info!("Starting server at 127.0.0.1:8080");
+    log::info!("Starting server at 127.0.0.1:{}", port);
 
     HttpServer::new(move || {
         App::new()
