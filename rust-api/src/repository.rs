@@ -5,6 +5,8 @@ use pwhash::bcrypt;
 
 use crate::schemas;
 
+const DB_NAME: &str = "ewp-db";
+
 #[derive(Clone)]
 pub struct Repository {
     client: Client,
@@ -18,18 +20,26 @@ impl Repository {
     }
 
     fn init_db(&self, collection_name: &str) -> Collection<Document> {
-        let db = self.client.database("your_database_name");
+        let db = self.client.database(DB_NAME);
         db.collection(collection_name)
     }
 
     pub async fn register_user(&self, user: schemas::User) -> Result<(), mongodb::error::Error> {
         let coll = self.init_db("users");
-        let hashed_password = bcrypt::hash(&user.password).unwrap();
+
+        let filter = doc! {"username": &user.username};
+        let doc = coll.find_one(filter, None).await?;
+        if doc.is_some() {
+            return Err(mongodb::error::Error::from(mongodb::error::ErrorKind::Io(std::io::Error::new(std::io::ErrorKind::AlreadyExists, "User already exists").into())));
+        }
+        
+
+        let hashed_password = bcrypt::hash(&user.password).expect("Failed to hash pasword");
         let user = schemas::User {
             password: hashed_password,
             ..user
         };
-        let doc = to_document(&user).unwrap();
+        let doc = to_document(&user).expect("Failed to convert user to document");
         coll.insert_one(doc, None).await?;
 
         Ok(())
@@ -62,7 +72,11 @@ impl Repository {
     }
 
     pub async fn create_profile(&self, profile: schemas::Profile) -> Result<(), mongodb::error::Error> {
-        let doc = to_document(&profile).unwrap();
+        let exists = self.check_profile_exist(&profile).await?;
+        if exists {
+            return Err(mongodb::error::Error::from(mongodb::error::ErrorKind::Io(std::io::Error::new(std::io::ErrorKind::AlreadyExists, "Profile already exists").into())));
+        }
+        let doc = to_document(&profile).expect("Failed to convert profile to document");
         let coll = self.init_db("profiles");
         coll.insert_one(doc, None).await?;
 
@@ -102,12 +116,13 @@ impl Repository {
         }
     }
 
-    pub async fn get_profiles_by_skill(&self, skill_name: &str) -> Result<Vec<schemas::Profile>, mongodb::error::Error> {
+   pub async fn get_profiles_by_skills(&self, skills_string: String) -> Result<Vec<schemas::Profile>, mongodb::error::Error> {
+        let skills: Vec<String> = skills_string.split(',').map(|s| s.trim().to_string()).collect();
         let coll = self.init_db("profiles");
-        let filter = doc! {"skills": {"$elemMatch": {"
-        name": skill_name}}};
+        let filter = doc! {"skills": {"$elemMatch": { "name": { "$in": skills } } } };
         let mut cursor = coll.find(filter, None).await?;
         let mut results = Vec::new();
+
         while let Some(doc) = cursor.next().await {
             match doc {
                 Ok(doc) => {
@@ -135,5 +150,13 @@ impl Repository {
         let filter = doc! {"id": profile_id.to_string()};
         coll.delete_one(filter, None).await?;
         Ok(())
+    }
+
+    pub async fn check_profile_exist(&self, profile: &schemas::Profile) -> Result<bool, mongodb::error::Error> {
+        let coll = self.init_db("profiles");
+        let filter = doc! {"name": &profile.name};
+
+        let doc = coll.find_one(filter, None).await?;
+        Ok(doc.is_some())
     }
 }
