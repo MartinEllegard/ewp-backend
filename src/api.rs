@@ -15,12 +15,17 @@ pub fn scoped_config(cfg: &mut web::ServiceConfig) {
         .service(
             web::resource("/profiles")
                 .route(web::get().to(get_profiles))
-                .route(web::post().to(post_profile)),
+                .route(web::post().to(post_profile))
+                .route(web::put().to(put_profile_by_id)),
         )
         .service(
             web::resource("/profiles/id/{id}").route(web::get().to(get_profile_by_id)), //.route(web::put().to(profiles::put_user))
         )
-        .service(web::resource("/profiles/me").route(web::get().to(get_profile_by_user)))
+        .service(
+            web::resource("/profiles/me")
+                .route(web::get().to(get_profile_by_user))
+                .route(web::put().to(put_profile_self)),
+        )
         .service(
             web::resource("/profiles/skills/{skills_string}")
                 .route(web::get().to(get_profiles_by_skills)),
@@ -145,6 +150,46 @@ pub async fn post_profile(
         skills: profile_no_id.skills,
     };
     let result = app_state.repository.create_profile(profile).await;
+    match result {
+        Ok(_) => HttpResponse::Ok().finish(),
+        Err(e) => HttpResponse::InternalServerError().body(e.to_string()),
+    }
+}
+
+pub async fn put_profile_self(
+    app_state: web::Data<AppState>,
+    profile_json: web::Json<schemas::Profile>,
+    jwt: Jwt,
+) -> HttpResponse {
+    let id = Uuid::parse_str(&jwt.0.as_str());
+    let profile = profile_json.into_inner();
+    match id {
+        Ok(id) => {
+            if id != profile.id {
+                let result = app_state.repository.update_profile(id, profile).await;
+
+                match result {
+                    Ok(_) => HttpResponse::Ok().finish(),
+                    Err(e) => HttpResponse::InternalServerError().body(e.to_string()),
+                }
+            } else {
+                HttpResponse::BadRequest().body("Id does not match logged in user")
+            }
+        }
+        Err(e) => HttpResponse::BadRequest().body(e.to_string()),
+    }
+}
+
+pub async fn put_profile_by_id(
+    app_state: web::Data<AppState>,
+    profile_json: web::Json<schemas::Profile>,
+    _: Jwt,
+) -> HttpResponse {
+    let profile = profile_json.into_inner();
+    let id = profile.id.clone();
+
+    let result = app_state.repository.update_profile(id, profile).await;
+
     match result {
         Ok(_) => HttpResponse::Ok().finish(),
         Err(e) => HttpResponse::InternalServerError().body(e.to_string()),

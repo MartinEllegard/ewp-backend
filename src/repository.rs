@@ -1,8 +1,12 @@
-use mongodb::{options::ClientOptions, Client, Collection, bson::{doc, Document, from_document, to_document}};
-use log;
-use uuid::Uuid;
 use futures::stream::StreamExt;
+use log;
+use mongodb::{
+    bson::{doc, from_document, to_document, Document},
+    options::ClientOptions,
+    Client, Collection,
+};
 use pwhash::bcrypt;
+use uuid::Uuid;
 
 use crate::schemas;
 
@@ -33,9 +37,11 @@ impl Repository {
         let filter = doc! {"username": &user.username};
         let doc = coll.find_one(filter, None).await?;
         if doc.is_some() {
-            return Err(mongodb::error::Error::from(mongodb::error::ErrorKind::Io(std::io::Error::new(std::io::ErrorKind::AlreadyExists, "User already exists").into())));
+            return Err(mongodb::error::Error::from(mongodb::error::ErrorKind::Io(
+                std::io::Error::new(std::io::ErrorKind::AlreadyExists, "User already exists")
+                    .into(),
+            )));
         }
-        
 
         let hashed_password = bcrypt::hash(&user.password).expect("Failed to hash pasword");
         let user = schemas::User {
@@ -48,7 +54,11 @@ impl Repository {
         Ok(())
     }
 
-    pub async fn authenticate_user(&self, username: &str, password: &str) -> Result<Option<schemas::User>, mongodb::error::Error> {
+    pub async fn authenticate_user(
+        &self,
+        username: &str,
+        password: &str,
+    ) -> Result<Option<schemas::User>, mongodb::error::Error> {
         let coll = self.init_db("users");
         let filter = doc! {"username": username};
         let doc = coll.find_one(filter, None).await?;
@@ -62,7 +72,10 @@ impl Repository {
         Ok(None)
     }
 
-    pub async fn find_user_by_id(&self, user_id: &str) -> Result<Option<schemas::User>, mongodb::error::Error> {
+    pub async fn find_user_by_id(
+        &self,
+        user_id: &str,
+    ) -> Result<Option<schemas::User>, mongodb::error::Error> {
         let coll = self.init_db("users");
         let filter = doc! {"id": user_id};
         let doc = coll.find_one(filter, None).await?;
@@ -74,10 +87,16 @@ impl Repository {
         Ok(None)
     }
 
-    pub async fn create_profile(&self, profile: schemas::Profile) -> Result<(), mongodb::error::Error> {
+    pub async fn create_profile(
+        &self,
+        profile: schemas::Profile,
+    ) -> Result<(), mongodb::error::Error> {
         let exists = self.check_profile_exist(&profile).await?;
         if exists {
-            return Err(mongodb::error::Error::from(mongodb::error::ErrorKind::Io(std::io::Error::new(std::io::ErrorKind::AlreadyExists, "Profile already exists").into())));
+            return Err(mongodb::error::Error::from(mongodb::error::ErrorKind::Io(
+                std::io::Error::new(std::io::ErrorKind::AlreadyExists, "Profile already exists")
+                    .into(),
+            )));
         }
         let doc = to_document(&profile).expect("Failed to convert profile to document");
         let coll = self.init_db("profiles");
@@ -104,7 +123,10 @@ impl Repository {
         Ok(results)
     }
 
-    pub async fn get_profiles_by_id(&self, profile_id: Uuid) -> Result<schemas::Profile, mongodb::error::Error> {
+    pub async fn get_profiles_by_id(
+        &self,
+        profile_id: Uuid,
+    ) -> Result<schemas::Profile, mongodb::error::Error> {
         let coll = self.init_db("profiles");
         let filter = doc! {"id": profile_id.to_string()};
         let result = coll.find_one(filter, None).await?;
@@ -113,14 +135,20 @@ impl Repository {
                 let profile: schemas::Profile = from_document(doc)?;
                 Ok(profile)
             }
-            None => {
-                Err(mongodb::error::Error::from(mongodb::error::ErrorKind::Io(std::io::Error::new(std::io::ErrorKind::NotFound, "Not found").into())))
-            }
+            None => Err(mongodb::error::Error::from(mongodb::error::ErrorKind::Io(
+                std::io::Error::new(std::io::ErrorKind::NotFound, "Not found").into(),
+            ))),
         }
     }
 
-   pub async fn get_profiles_by_skills(&self, skills_string: String) -> Result<Vec<schemas::Profile>, mongodb::error::Error> {
-        let skills: Vec<String> = skills_string.split(',').map(|s| s.trim().to_string()).collect();
+    pub async fn get_profiles_by_skills(
+        &self,
+        skills_string: String,
+    ) -> Result<Vec<schemas::Profile>, mongodb::error::Error> {
+        let skills: Vec<String> = skills_string
+            .split(',')
+            .map(|s| s.trim().to_string())
+            .collect();
         let coll = self.init_db("profiles");
         let filter = doc! {"skills": {"$elemMatch": { "name": { "$in": skills } } } };
         let mut cursor = coll.find(filter, None).await?;
@@ -141,9 +169,14 @@ impl Repository {
         Ok(results)
     }
 
-    pub async fn update_profile(&self, profile_id: Uuid, update_doc: Document) -> Result<(), mongodb::error::Error> {
+    pub async fn update_profile(
+        &self,
+        profile_id: Uuid,
+        profile: schemas::Profile,
+    ) -> Result<(), mongodb::error::Error> {
         let coll = self.init_db("profiles");
         let filter = doc! {"id": profile_id.to_string()};
+        let update_doc = to_document(&profile).expect("Failed to convert profile to document");
         coll.update_one(filter, update_doc, None).await?;
         Ok(())
     }
@@ -155,7 +188,10 @@ impl Repository {
         Ok(())
     }
 
-    pub async fn check_profile_exist(&self, profile: &schemas::Profile) -> Result<bool, mongodb::error::Error> {
+    pub async fn check_profile_exist(
+        &self,
+        profile: &schemas::Profile,
+    ) -> Result<bool, mongodb::error::Error> {
         let coll = self.init_db("profiles");
         let filter = doc! {"name": &profile.name};
 
