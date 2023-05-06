@@ -31,10 +31,6 @@ pub fn scoped_config(cfg: &mut web::ServiceConfig) {
                 .route(web::get().to(get_profiles_by_skills)),
         )
         .service(web::resource("/auth").route(web::post().to(authenticate_user)));
-    // cfg.service(
-    //     web::resource("/profiles/{id}/skills")
-    //         .route(web::get().to(profiles::get_user_skills))
-    // );
 }
 
 pub async fn register_user(

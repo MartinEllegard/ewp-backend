@@ -20,8 +20,7 @@ async fn main() -> std::io::Result<()> {
     dotenv::dotenv().ok();
 
     // Read the port number from the database connection string from env
-    let db_env_url =
-        env::var("DATABASE_CONNECTION").unwrap();
+    let db_env_url = env::var("DATABASE_CONNECTION").unwrap();
 
     // Read the port number from the PORT environment variable or use a default value
     let port: u16 = env::var("PORT")
