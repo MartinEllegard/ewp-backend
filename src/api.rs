@@ -98,7 +98,7 @@ pub async fn post_profile(
     profile_json: web::Json<schemas::ProfileNoId>,
     jwt: Jwt,
 ) -> HttpResponse {
-    let id = Uuid::parse_str(&jwt.0.as_str()).unwrap_or(Uuid::new_v4());
+    let id = Uuid::parse_str(jwt.0.as_str()).unwrap_or(Uuid::new_v4());
     let profile_no_id = profile_json.into_inner();
     let profile = schemas::Profile {
         id,
@@ -125,7 +125,7 @@ pub async fn put_profile_self(
     profile_json: web::Json<schemas::Profile>,
     jwt: Jwt,
 ) -> HttpResponse {
-    let id = Uuid::parse_str(&jwt.0.as_str());
+    let id = Uuid::parse_str(jwt.0.as_str());
     let profile = profile_json.into_inner();
     match id {
         Ok(id) => {
@@ -150,7 +150,7 @@ pub async fn put_profile_by_id(
     _: Jwt,
 ) -> HttpResponse {
     let profile = profile_json.into_inner();
-    let id = profile.id.clone();
+    let id = profile.id;
 
     if id == profile.id {
         let result = app_state.repository.update_profile(id, profile).await;
@@ -180,7 +180,7 @@ pub async fn get_profile_by_id(
 }
 
 pub async fn get_profile_by_user(app_state: web::Data<AppState>, jwt: Jwt) -> HttpResponse {
-    let id = Uuid::parse_str(&jwt.0.as_str());
+    let id = Uuid::parse_str(jwt.0.as_str());
     match id {
         Ok(id) => {
             let profile = app_state.repository.get_profiles_by_id(id).await;

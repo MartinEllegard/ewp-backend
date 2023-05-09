@@ -1,5 +1,4 @@
 use actix_web::{web, App, HttpServer, Responder};
-use log;
 use std::env;
 
 mod api;
