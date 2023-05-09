@@ -7,7 +7,6 @@ use crate::{
     auth::{Claims, Jwt},
     schemas, AppState,
 };
-//use actix_web_httpauth::extractors::bearer::BearerAuth;
 
 pub fn scoped_config(cfg: &mut web::ServiceConfig) {
     //User routes
@@ -86,37 +85,6 @@ pub async fn authenticate_user(
     }
 }
 
-// Update the update_profile handler to check for user authorization
-// pub async fn update_profile(
-//     data: web::Data<AppState>,
-//     jwt: Jwt, // Add Jwt extractor here
-//     path: web::Path<Uuid>,
-//     update_doc: web::Json<Document>,
-// ) -> impl Responder {
-//     let profile_id = path.into_inner();
-//     let profile = data.repository.get_profile_by_id(profile_id).await;
-//     match profile {
-//         Ok(Some(profile)) => {
-//             if jwt.0 == profile.user_id {
-//                 match data.repository.update_profile(profile_id, update_doc.into_inner()).await {
-//                     Ok(_) => HttpResponse::Ok().finish(),
-//                     Err(e) => {
-//                         eprintln!("Error updating profile: {}", e);
-//                         HttpResponse::InternalServerError().finish()
-//                     }
-//                 }
-//             } else {
-//                 HttpResponse::Forbidden().finish()
-//             }
-//         }
-//         Ok(None) => HttpResponse::NotFound().finish(),
-//         Err(e) => {
-//             eprintln!("Error getting profile: {}", e);
-//             HttpResponse::InternalServerError().finish()
-//         }
-//     }
-// }
-
 pub async fn get_profiles(app_state: web::Data<AppState>, _: Jwt) -> HttpResponse {
     let profiles = app_state.repository.get_all_profiles().await;
     match profiles {
@@ -161,7 +129,7 @@ pub async fn put_profile_self(
     let profile = profile_json.into_inner();
     match id {
         Ok(id) => {
-            if id != profile.id {
+            if id == profile.id {
                 let result = app_state.repository.update_profile(id, profile).await;
 
                 match result {
@@ -184,11 +152,15 @@ pub async fn put_profile_by_id(
     let profile = profile_json.into_inner();
     let id = profile.id.clone();
 
-    let result = app_state.repository.update_profile(id, profile).await;
+    if id == profile.id {
+        let result = app_state.repository.update_profile(id, profile).await;
 
-    match result {
-        Ok(_) => HttpResponse::Ok().finish(),
-        Err(e) => HttpResponse::InternalServerError().body(e.to_string()),
+        match result {
+            Ok(_) => HttpResponse::Ok().finish(),
+            Err(e) => HttpResponse::InternalServerError().body(e.to_string()),
+        }
+    } else {
+        HttpResponse::BadRequest().body("Id not match posted user")
     }
 }
 
