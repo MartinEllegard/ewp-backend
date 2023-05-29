@@ -1,7 +1,7 @@
-use jsonwebtoken::{decode, encode, DecodingKey, EncodingKey, Header, Validation};
-use serde::{Deserialize, Serialize};
 use actix_web::{dev, Error, FromRequest, HttpRequest};
 use futures::future::{ready, Ready};
+use jsonwebtoken::{decode, encode, DecodingKey, EncodingKey, Header, Validation};
+use serde::{Deserialize, Serialize};
 
 #[derive(Debug, Serialize, Deserialize)]
 pub struct Claims {
@@ -19,13 +19,12 @@ impl Claims {
         encode(&Header::default(), self, &encoding_key)
     }
 
-    pub fn decode(token: &str, secret: &[u8]) ->
-    Result<Self, jsonwebtoken::errors::Error> {
+    pub fn decode(token: &str, secret: &[u8]) -> Result<Self, jsonwebtoken::errors::Error> {
         let decoding_key = DecodingKey::from_secret(secret);
         let validation = Validation::default();
         let token_data = decode::<Claims>(token, &decoding_key, &validation)?;
         Ok(token_data.claims)
-        }
+    }
 }
 
 pub struct Jwt(pub String);
@@ -48,5 +47,6 @@ impl FromRequest for Jwt {
             }
         }
         ready(Err(actix_web::error::ErrorUnauthorized("Unauthorized")))
-                    }
     }
+}
+
