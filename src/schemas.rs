@@ -1,5 +1,4 @@
-
-use serde::{Serialize, Deserialize};
+use serde::{Deserialize, Serialize};
 use uuid::Uuid;
 
 #[derive(Debug, Serialize, Deserialize, Clone)]
@@ -75,3 +74,4 @@ pub struct ProfileNoId {
     pub projects: Vec<Project>,
     pub certificates: Vec<Certificate>,
 }
+

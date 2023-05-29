@@ -49,7 +49,7 @@ def generate_random_people(n: int):
 
         # Generate a random set of work experience
         experience = []
-        for j in range(random.randint(1, 3)):
+        for _ in range(random.randint(1, 3)):
             exp = {}
             exp["company"] = random.choice(companies)
             exp["position"] = random.choice(descriptions)
@@ -59,7 +59,7 @@ def generate_random_people(n: int):
 
         # Generate a random set of education
         education = []
-        for j in range(random.randint(1, 2)):
+        for _ in range(random.randint(1, 2)):
             edu = {}
             edu["school"] = random.choice(schools)
             edu["degree"] = random.choice(degrees)
@@ -69,7 +69,7 @@ def generate_random_people(n: int):
 
         # Generate a random set of projects
         projects = []
-        for j in range(random.randint(1, 2)):
+        for _ in range(random.randint(1, 2)):
             project = {}
             project["name"] = random.choice(project_names)
             project["description"] = "Lorem ipsum dolor sit amet, consectetur adipiscing elit."
@@ -78,7 +78,7 @@ def generate_random_people(n: int):
 
         # Generate a random set of certificates
         certificates = []
-        for j in range(random.randint(0, 2)):
+        for _ in range(random.randint(0, 2)):
             certificate = {}
             certificate["name"] = random.choice(certificate_names)
             certificate["description"] = "Lorem ipsum dolor sit amet, consectetur adipiscing elit."
