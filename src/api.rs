@@ -193,6 +193,7 @@ pub async fn get_profile_by_user(app_state: web::Data<AppState>, jwt: Jwt) -> Ht
     }
 }
 
+//TODO: This is currently bugged and need debugging
 pub async fn get_profiles_by_skills(
     app_state: web::Data<AppState>,
     skills_string: web::Path<String>,
